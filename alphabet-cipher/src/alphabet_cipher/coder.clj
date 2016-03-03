@@ -32,6 +32,19 @@
     (subs keyword 0 (count message))
     (repeat-keyword (str keyword keyword) message)))
 
+(defn add-one-letter
+  [target pool]
+  (clojure.string/join [target (str (get pool (count target)))]))
+
+(defn reduce-keyword
+  [repeated-k keyword]
+  (if (= (repeat-keyword keyword repeated-k) repeated-k)
+    keyword
+    (reduce-keyword
+      repeated-k
+      (add-one-letter keyword repeated-k))))
+
+
 (defn repeat-keyword-vec
   [keyword message]
   (->>
@@ -47,7 +60,7 @@
     (clojure.string/join)))
 
 
-(defn decodeLetter
+(defn decode-letter
   [letter-alph letter-idx]
   (get (vec (alphabet-int-from "a")) (.indexOf (vec (alphabet-int-from (str letter-alph))) letter-idx)))
 
@@ -65,8 +78,10 @@
   (join-solution
       (let [x (repeat-keyword-vec keyword message)]
         (map-indexed
-          (fn [idx lt] (decodeLetter lt (str (get message idx))))
+          (fn [idx lt] (decode-letter lt (str (get message idx))))
           x))))
 
 (defn decipher [cipher message]
-  "decypherme")
+  "decypherme"
+  (let [d (decode message cipher)]
+    (reduce-keyword d (str (get d 0)))))
